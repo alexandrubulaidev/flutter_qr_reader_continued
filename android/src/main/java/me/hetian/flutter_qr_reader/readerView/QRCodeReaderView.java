@@ -49,7 +49,6 @@ import java.util.EnumSet;
 import java.util.Map;
 
 import com.google.zxing.client.android.camera.CameraManager;
-
 import me.hetian.flutter_qr_reader.reader.DecodeFormatManager;
 import me.hetian.flutter_qr_reader.reader.MyMultiFormatReader;
 import me.hetian.flutter_qr_reader.reader.MyPlanarYUVLuminanceSource;

@@ -2,13 +2,9 @@ package me.hetian.flutter_qr_reader.custom;
 
 import android.app.ActionBar;
 import android.content.Context;
-import android.graphics.PointF;
 import android.os.Vibrator;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 
@@ -23,20 +19,20 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 import me.hetian.flutter_qr_reader.R;
+import me.hetian.flutter_qr_reader.Util;
 import me.hetian.flutter_qr_reader.readerView.QRCodeReaderView;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 
-public class QrReaderNewView implements PlatformView, QRCodeReaderView.OnQRCodeReadListener, MethodChannel.MethodCallHandler, QRCodeView.Delegate {
-    private static final String TAG = QrReaderNewView.class.getSimpleName();
-    private MethodChannel mMethodChannel;
-    private Context mContext;
+public class QrReaderNewView implements PlatformView, MethodChannel.MethodCallHandler, QRCodeView.Delegate {
+    //    private static final String TAG = QrReaderNewView.class.getSimpleName();
+    private final MethodChannel mMethodChannel;
+    private final Context mContext;
     private Map<String, Object> mParams;
     ZXingView _view;
     BinaryMessenger binaryMessenger;
-
-    public static String EXTRA_FOCUS_INTERVAL = "extra_focus_interval";
-    public static String EXTRA_TORCH_ENABLED = "extra_torch_enabled";
+    //    public static String EXTRA_FOCUS_INTERVAL = "extra_focus_interval";
+//    public static String EXTRA_TORCH_ENABLED = "extra_torch_enabled";
     boolean flashlight = false;
 
     public QrReaderNewView(Context context, BinaryMessenger binaryMessenger, int id, Map<String, Object> params) {
@@ -44,10 +40,11 @@ public class QrReaderNewView implements PlatformView, QRCodeReaderView.OnQRCodeR
         this.mParams = params;
         this.binaryMessenger = binaryMessenger;
         // 创建视图
-        int width = (int) mParams.get("width");
-        int height = (int) mParams.get("height");
-        int rectWidth = (int) mParams.get("rectWidth");
-        int isOnlyDecodeScanBoxArea = (int) mParams.get("isOnlyDecodeScanBoxArea");
+        int width = Util.getIntValue(mParams.get("width"));
+        int height = Util.getIntValue(mParams.get("height"));
+        int rectWidth = Util.getIntValue(mParams.get("rectWidth"));
+        int rectHeight = Util.getIntValue(mParams.get("rectWidth"));
+        int isOnlyDecodeScanBoxArea = Util.getIntValue(mParams.get("isOnlyDecodeScanBoxArea"));
         _view
                 = (ZXingView) LayoutInflater.from(context).inflate(R.layout.zxing_view, null);
         _view.setDelegate(this);
@@ -56,16 +53,17 @@ public class QrReaderNewView implements PlatformView, QRCodeReaderView.OnQRCodeR
         _view.setMinimumWidth(width);
         if (rectWidth > 0) {
             _view.getScanBoxView().setRectWidth(rectWidth);
-            _view.getScanBoxView().setRectHeight(rectWidth);
+            _view.getScanBoxView().setRectHeight(rectHeight);
         }
-        _view.getScanBoxView().setOnlyDecodeScanBoxArea(isOnlyDecodeScanBoxArea == 0 ? false : true);
+        _view.getScanBoxView().setAutoZoom(false);
+        _view.getScanBoxView().setOnlyDecodeScanBoxArea(isOnlyDecodeScanBoxArea != 0);
         // 操作监听
         mMethodChannel = new MethodChannel(binaryMessenger, "me.hetian.plugins/flutter_qr_reader/reader_view_" + id);
         mMethodChannel.setMethodCallHandler(this);
     }
 
     @Override
-    public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+    public void onMethodCall(@NonNull MethodCall methodCall, @NonNull MethodChannel.Result result) {
         try {
             switch (methodCall.method) {
                 case "flashlight":
@@ -80,14 +78,16 @@ public class QrReaderNewView implements PlatformView, QRCodeReaderView.OnQRCodeR
                 case "startCamera":
                     _view.startCamera();
                     _view.startSpotAndShowRect();
+//                    _view.startSpot(); // 开始识别
                     result.success(true);
                     break;
                 case "stopCamera":
-                    _view.stopCamera();
+                    _view.stopSpot();
                     result.success(true);
                     break;
             }
         } catch (Exception e) {
+            e.printStackTrace();
 
         }
 
@@ -106,20 +106,9 @@ public class QrReaderNewView implements PlatformView, QRCodeReaderView.OnQRCodeR
             _view = null;
             mParams = null;
         } catch (Exception e) {
+            e.printStackTrace();
 
         }
-    }
-
-    @Override
-    public void onQRCodeRead(String text, PointF[] points) {
-        HashMap<String, Object> rest = new HashMap<String, Object>();
-        rest.put("text", text);
-        ArrayList<String> poi = new ArrayList<String>();
-        for (PointF point : points) {
-            poi.add(point.x + "," + point.y);
-        }
-        rest.put("points", poi);
-        mMethodChannel.invokeMethod("onQRCodeRead", rest);
     }
 
     private void vibrate() {
@@ -129,18 +118,11 @@ public class QrReaderNewView implements PlatformView, QRCodeReaderView.OnQRCodeR
 
     @Override
     public void onScanQRCodeSuccess(String result) {
-        Log.e("aaa", "扫码成功");
-        Log.i(TAG, "result:" + result);
-        Log.e(TAG, "扫描结果为：" + result);
         vibrate();
-        _view.startSpot(); // 开始识别
-
-        HashMap<String, Object> rest = new HashMap<String, Object>();
+        _view.stopSpot();
+        HashMap<String, Object> rest = new HashMap<>();
         rest.put("text", result);
-        ArrayList<String> poi = new ArrayList<String>();
-//        for (PointF point : points) {
-//            poi.add(point.x + "," + point.y);
-//        }
+        ArrayList<String> poi = new ArrayList<>();
         rest.put("points", poi);
         mMethodChannel.invokeMethod("onQRCodeRead", rest);
     }
@@ -164,6 +146,8 @@ public class QrReaderNewView implements PlatformView, QRCodeReaderView.OnQRCodeR
 
     @Override
     public void onScanQRCodeOpenCameraError() {
-        Log.e(TAG, "打开相机出错");
+//        Log.e(TAG, "打开相机出错");
     }
+
+
 }

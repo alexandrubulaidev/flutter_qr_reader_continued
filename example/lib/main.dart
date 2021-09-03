@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_qr_reader_copy/flutter_qr_reader_copy.dart';
 import 'dart:async';
 
-import 'package:flutter_qr_reader/flutter_qr_reader.dart';
 import 'package:flutter_qr_reader_example/qrcode_reader_view.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -40,8 +40,8 @@ class _MyAppState extends State<MyApp> {
       return new Scaffold(
         body: QrcodeReaderView(
           onScan: (result) async {
-            Navigator.of(context).pop();
-            alert(result);
+            // Navigator.of(context).pop();
+            // alert(result);
           },
           headerWidget: AppBar(
             backgroundColor: Colors.transparent,
@@ -186,6 +186,7 @@ class _MyAppState extends State<MyApp> {
                         width: MediaQuery.of(context).size.width,
                         height: 350,
                         rectWidth: 240,
+                        isOnlyDecodeScanBoxArea: 1,
                         callback: (container) {
                           this._controller = container;
                           this.startScan();

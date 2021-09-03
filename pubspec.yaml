@@ -1,7 +1,7 @@
 name: flutter_qr_reader_copy
 description: Copy flutter_qr_reader modification   QR code (scan QRCode and picture) recognition （AndroidView/UiKitView）
-version: 1.0.6
-homepage: https://github.com/hetian9288/flutter_qr_reader
+version: 1.0.8
+homepage: https://github.com/tangbincheng/flutter_qr_reader.git
 
 environment:
   sdk: ">=2.12.0-0 <3.0.0"

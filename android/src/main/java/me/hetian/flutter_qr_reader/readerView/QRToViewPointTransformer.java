@@ -5,6 +5,7 @@ import android.graphics.PointF;
 
 import com.google.zxing.ResultPoint;
 
+
 public class QRToViewPointTransformer {
 
   public PointF[] transform(ResultPoint[] qrPoints, boolean isMirrorPreview,
