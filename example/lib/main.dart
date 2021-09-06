@@ -15,7 +15,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   bool _flashlightState = false;
@@ -25,6 +25,30 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print("-didChangeAppLifecycleState-" + state.toString());
+    switch (state) {
+      case AppLifecycleState.inactive: // 处于这种状态的应用程序应该假设它们可能在任何时候暂停。
+        break;
+      case AppLifecycleState.resumed: //从后台切换前台，界面可见
+        startScan();//android使用
+        break;
+      case AppLifecycleState.paused: // 界面不可见，后台
+        _controller!.onStop();//android使用
+        break;
+      case AppLifecycleState.detached: // APP结束时调用
+        break;
+    }
   }
 
   void alert(String tip) {
@@ -49,9 +73,7 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         floatingActionButton: ElevatedButton(
-          onPressed: () {
-
-          },
+          onPressed: () {},
           child: Text('关闭或者打开'),
         ),
       );
@@ -198,13 +220,12 @@ class _MyAppState extends State<MyApp> {
           );
         }),
         floatingActionButton: ElevatedButton(
-          onPressed: (){
-            if(_showScanView){
+          onPressed: () {
+            if (_showScanView) {
               stopScan();
-            }else{
+            } else {
               startScan();
             }
-
           },
           child: Text('启动或者停止'),
         ),

@@ -1,6 +1,5 @@
 package me.hetian.flutter_qr_reader;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -23,8 +22,8 @@ import me.hetian.flutter_qr_reader.reader.MyMultiFormatReader;
 /**
  * 描述:解析二维码图片
  */
+
 public class QRCodeDecoder {
-    private static Context context;
     public static final Map<DecodeHintType, Object> HINTS = new EnumMap<>(DecodeHintType.class);
     private static final String TAG = "QRCodeDecoder";
 
@@ -61,8 +60,8 @@ public class QRCodeDecoder {
      * @param picturePath 要解析的二维码图片本地路径
      * @return 返回二维码图片里的内容 或 null
      */
-    public static String syncDecodeQRCode(Context context, String picturePath) {
-        return syncDecodeQRCode(context, getDecodeAbleBitmap(picturePath));
+    public static String syncDecodeQRCode( String picturePath) {
+        return syncDecodeQRCode( getDecodeAbleBitmap(picturePath));
     }
 
     /**
@@ -71,9 +70,8 @@ public class QRCodeDecoder {
      * @param bitmap 要解析的二维码图片
      * @return 返回二维码图片里的内容 或 null
      */
-    public static String syncDecodeQRCode(Context context, Bitmap bitmap) {
-        QRCodeDecoder.context = context;
-        Result result = null;
+    public static String syncDecodeQRCode( Bitmap bitmap) {
+        Result result;
         MyMultiFormatReader multiFormatReader = new MyMultiFormatReader();
         multiFormatReader.setHints(HINTS);
         try {
@@ -117,7 +115,7 @@ public class QRCodeDecoder {
      * 将本地图片文件转换成可解码二维码的 Bitmap。为了避免图片太大，这里对图片进行了压缩。感谢 https://github.com/devilsen 提的 PR
      *
      * @param picturePath 本地图片文件路径
-     * @return
+     *
      */
     private static Bitmap getDecodeAbleBitmap(String picturePath) {
         try {
@@ -134,11 +132,12 @@ public class QRCodeDecoder {
             Matrix matrix = new Matrix();
             matrix.setRotate(90);
             // 创建新的图片
-            Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
+            return Bitmap.createBitmap(bitmap, 0, 0,
                     bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            return resizedBitmap;
         } catch (Exception e) {
             return null;
         }
     }
+
+
 }

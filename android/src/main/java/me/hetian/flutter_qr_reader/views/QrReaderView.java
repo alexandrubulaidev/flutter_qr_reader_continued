@@ -56,6 +56,7 @@ public class QrReaderView implements PlatformView, QRCodeReaderView.OnQRCodeRead
 
     @Override
     public void dispose() {
+        _view.closeDriver();
         _view = null;
         mParams = null;
     }

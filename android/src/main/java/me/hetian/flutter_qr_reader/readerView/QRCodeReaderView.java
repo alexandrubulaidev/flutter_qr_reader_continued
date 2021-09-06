@@ -174,7 +174,12 @@ public class QRCodeReaderView extends SurfaceView
      */
     public void stopCamera() {
         mCameraManager.stopPreview();
+        mCameraManager.closeDriver();
     }
+    public void closeDriver(){
+        mCameraManager.closeDriver();
+    }
+    
 
     /**
      * Set Camera autofocus interval value

@@ -1,3 +1,5 @@
+## 1.0.9
+* Fixed a problem with starting autofocus on some phones
 ## 1.0.8
 * Remove warning
 ## 1.0.7
