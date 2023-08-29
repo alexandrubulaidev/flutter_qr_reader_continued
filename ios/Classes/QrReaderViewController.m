@@ -98,7 +98,9 @@
         if ([[metadataObj type] isEqualToString:AVMetadataObjectTypeQRCode]) {
             NSMutableDictionary *dic = [[NSMutableDictionary alloc] init];
             [dic setObject:[metadataObj stringValue] forKey:@"text"];
-            [_channel invokeMethod:@"onQRCodeRead" arguments:dic];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [_channel invokeMethod:@"onQRCodeRead" arguments:dic];
+            });            
             [self performSelectorOnMainThread:@selector(stopReading) withObject:nil waitUntilDone:NO];
             _isReading = NO;
         }
