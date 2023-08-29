@@ -32,9 +32,13 @@
     if (features.count > 0) {
         CIQRCodeFeature *feature = [features objectAtIndex:0];
         NSString *qrData = feature.messageString;
-        result(qrData);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            result(qrData);
+        });        
     } else {
-        result(NULL);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            result(NULL);
+        });  
     }
 }
 
