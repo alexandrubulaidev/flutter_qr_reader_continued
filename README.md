@@ -1,4 +1,4 @@
-# flutter_qr_reader_copy
+# flutter_qr_reader
 
 
 复制flutter_qr_reader插件进行修改，主要是增加一种扫码识别方式，因为有遇到oppo手机使用zxing无法识别的情况

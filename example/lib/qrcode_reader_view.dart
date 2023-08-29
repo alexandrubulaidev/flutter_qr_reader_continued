@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_qr_reader_copy/flutter_qr_reader_copy.dart';
+import 'package:flutter_qr_reader/flutter_qr_reader.dart';
 import "package:image_picker/image_picker.dart";
 import 'package:permission_handler/permission_handler.dart';
 
