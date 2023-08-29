@@ -79,9 +79,9 @@
     [_captureSession addInput:input];
     AVCaptureMetadataOutput *captureMetadataOutput = [[AVCaptureMetadataOutput alloc] init];
     [_captureSession addOutput:captureMetadataOutput];
-    // dispatch_queue_t dispatchQueue;
-    // dispatchQueue = dispatch_queue_create("myQueue", NULL);
-    [captureMetadataOutput setMetadataObjectsDelegate:self queue:nil];
+    dispatch_queue_t dispatchQueue;
+    dispatchQueue = dispatch_queue_create("myQueue", NULL);
+    [captureMetadataOutput setMetadataObjectsDelegate:self queue:dispatchQueue];
     [captureMetadataOutput setMetadataObjectTypes:[NSArray arrayWithObject:AVMetadataObjectTypeQRCode]];
     _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
     [_videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
@@ -93,18 +93,19 @@
 
 
 -(void)captureOutput:(AVCaptureOutput *)captureOutput didOutputMetadataObjects:(NSArray *)metadataObjects fromConnection:(AVCaptureConnection *)connection{
-    if (metadataObjects != nil && [metadataObjects count] > 0) {
-        AVMetadataMachineReadableCodeObject *metadataObj = [metadataObjects objectAtIndex:0];
-        if ([[metadataObj type] isEqualToString:AVMetadataObjectTypeQRCode]) {
-            NSMutableDictionary *dic = [[NSMutableDictionary alloc] init];
-            [dic setObject:[metadataObj stringValue] forKey:@"text"];
-            dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (metadataObjects != nil && [metadataObjects count] > 0) {
+            AVMetadataMachineReadableCodeObject *metadataObj = [metadataObjects objectAtIndex:0];
+            if ([[metadataObj type] isEqualToString:AVMetadataObjectTypeQRCode]) {
+                NSMutableDictionary *dic = [[NSMutableDictionary alloc] init];
+                [dic setObject:[metadataObj stringValue] forKey:@"text"];
                 [_channel invokeMethod:@"onQRCodeRead" arguments:dic];
-            });            
-            [self performSelectorOnMainThread:@selector(stopReading) withObject:nil waitUntilDone:NO];
-            _isReading = NO;
-        }
-    }
+                        
+                [self performSelectorOnMainThread:@selector(stopReading) withObject:nil waitUntilDone:NO];
+                _isReading = NO;
+            }
+        } 
+    });        
 }
 
 
