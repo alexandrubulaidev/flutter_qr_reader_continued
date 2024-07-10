@@ -36,6 +36,7 @@ android {
     defaultConfig {
         minSdkVersion 16
     }
+    namespace 'me.hetian.flutter_qr_reader'
 }
 
 dependencies {
